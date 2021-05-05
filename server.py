@@ -1,5 +1,5 @@
 from flask import Flask
-import os, time, json, hashlib
+import os, time, json, hashlib, threading
 
 # Initing Flask
 app = Flask(__name__)
@@ -8,6 +8,8 @@ app = Flask(__name__)
 hashSalt = "LongLiveMyAnimeWaifus"
 
 allowedUsernameChars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "_", "."]
+
+autoSave = True
 
 accounts = {
     # "username": {
@@ -56,6 +58,26 @@ def authCheck(username, password):
     else:
         return False
 
+def loadDatabase():
+    global accounts, chats
+    try:
+        with open("data.json", "r") as f:
+            data = json.loads(f.read())
+            accounts = data["accounts"]
+            chats = data["chats"]
+    except:
+        print("ERROR! Failed to load database")
+
+def autoSaveDatabase():
+    while autoSave:
+        time.sleep(300)
+        try:
+            with open("data.json", "w") as f:
+                f.write(json.dumps({"accounts": accounts,"chats": chats}))
+            print("Auto-saved database "+str(time.time()))
+        except:
+            print("Failed to auto-save database "+str(time.time()))
+
 # Routes
 @app.route("/")
 def root():
@@ -75,12 +97,23 @@ def root():
     9) Recive texts from a Chat Room "/recv/username/password/chatId/fromIndex/toIndex"
     """
 
+@app.route("/saveData/<code>")
+def saveDatabase(code):
+    if code == "LongLiveMyAnimeWaifus":
+        try:
+            with open("data.json", "w") as f:
+                f.write(json.dumps({"accounts": accounts,"chats": chats}))
+            return "Successfully saved"
+        except:
+            return "Failed to save"
+    else:
+        return "Failed to save"
+
 @app.route("/signup/<username>/<password>")
 def signup(username, password):
-    if usernameCharCheck(username) and (username not in accounts) and (len(username) >= 4):
-        if len(password) >= 8:
+    if usernameCharCheck(username) and (username not in accounts) and (len(username) >= 4) and (len(username) <= 18):
+        if len(password) >= 8 and len(password) <= 64:
             accounts[username] = {"index": len(accounts), "password": hashlib.sha256((password+hashSalt).encode("ascii")).hexdigest(), "joined": time.time(), "chats": []}
-            print (accounts[username]["password"])
             return "Account successfully created"
         else:
             return "Password too short"
@@ -157,7 +190,7 @@ def getChatRoomData(username, password, chatId):
 
 @app.route("/send/<username>/<password>/<chatId>/<body>")
 def send(chatId, username, password, body):
-    if authCheck(username, password) and (chatId in chats) and len(body)<=256:
+    if authCheck(username, password) and (chatId in chats) and (len(body)>=1) and (len(body)<=256):
         if username in chats[chatId]["users"]:
             chats[chatId]["texts"].insert(0, (username, body, time.time()))
             return "Message successfully sent"
@@ -188,4 +221,6 @@ def recieve(chatId, username, password, fromIndex, toIndex):
 
 # Starting point of the app
 if __name__ == "__main__":
+    loadDatabase()
+    savingThread = threading.Thread(target=autoSaveDatabase);savingThread.start()
     app.run(port=80, debug=True)

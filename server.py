@@ -1,44 +1,55 @@
 from flask import Flask
-import os, time, json
+import os, time, json, hashlib
 
 # Initing Flask
 app = Flask(__name__)
 
 # Variables
+hashSalt = "LongLiveMyAnimeWaifus"
+
+allowedUsernameChars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "_", "."]
+
 accounts = {
-    "username": {
-        "index": 0,
-        "password": "pass1234",
-        "joined": 0.0,
-        "chats": []
-    },
-    "rhyme": {
-        "index": 1,
-        "password": "pass1234",
-        "joined": 0.0,
-        "chats": ["0"]
-    },
-    "ryan": {
-        "index": 2,
-        "password": "pass1234",
-        "joined": 0.0,
-        "chats": ["0"]
-    }
+    # "username": {
+    #     "index": 0,
+    #     "password": "pass1234",
+    #     "joined": 0.0,
+    #     "chats": []
+    # },
+    # "rhyme": {
+    #     "index": 1,
+    #     "password": "pass1234",
+    #     "joined": 0.0,
+    #     "chats": ["0"]
+    # },
+    # "ryan": {
+    #     "index": 2,
+    #     "password": "pass1234",
+    #     "joined": 0.0,
+    #     "chats": ["0"]
+    # }
 }
 
 chats = {
-    "0": {
-        "users": ["rhyme", "ryan"],
-        "admins": ["rhyme"],
-        "settings": {},
-        "texts": [("hellow", "body"), ("username", "body")]
-    }
+    # "0": {
+    #     "users": ["rhyme", "ryan"],
+    #     "admins": ["rhyme"],
+    #     "settings": {},
+    #     "texts": [("hellow", "body"), ("username", "body")]
+    # }
 }
 
 # Functions
+def usernameCharCheck(username):
+    username=username.lower()
+    for char in username:
+        if char not in allowedUsernameChars:
+            return False
+    return True
+
 def authCheck(username, password):
     if username in accounts:
-        if accounts[username]["password"] == password:
+        if accounts[username]["password"] == hashlib.sha256((password+hashSalt).encode("ascii")).hexdigest():
             return True
         else:
             return False
@@ -48,13 +59,28 @@ def authCheck(username, password):
 # Routes
 @app.route("/")
 def root():
-    return "Konnichiwa Sekai"
+    return """
+    Konnichiwa Sekai</br>
+    Welcome to RhymeChat2 API. This server operates in a REST fashion.</br>
+    </br>
+    Available command:</br>
+    1) Signing up -> "/signup/username/password"</br>
+    2) Creating Chat Room -> "/createChatRoom/username/password"</br>
+    3) Getting Chat Rooms -> "/getChatRooms/username/password"</br>
+    4) Add someone to Chat Room -> "/addToChatRoom/username/password/chatId/personToAdd"</br>
+    5) Making someone Admin -> "/makeAdmin/username/password/chatId/personToMakeAdmin"</br>
+    6) Removong someone from Admin -> "/removeAdmin/username/password/chatId/personToRemoveFromAdmin"</br>
+    7) Get Chat Room data -> "/getChatRoomData/username/password/chatId"</br>
+    8) Send text to Chat Room "/send/username/password/chatId/body"</br>
+    9) Recive texts from a Chat Room "/recv/username/password/chatId/fromIndex/toIndex"
+    """
 
 @app.route("/signup/<username>/<password>")
 def signup(username, password):
-    if username not in accounts and len(username) >= 4:
-        if len(password) >= 8: 
-            accounts[username] = {"index": len(accounts), "password": password, "joined": time.time(), chats: []}
+    if usernameCharCheck(username) and (username not in accounts) and (len(username) >= 4):
+        if len(password) >= 8:
+            accounts[username] = {"index": len(accounts), "password": hashlib.sha256((password+hashSalt).encode("ascii")).hexdigest(), "joined": time.time(), "chats": []}
+            print (accounts[username]["password"])
             return "Account successfully created"
         else:
             return "Password too short"
@@ -131,9 +157,9 @@ def getChatRoomData(username, password, chatId):
 
 @app.route("/send/<username>/<password>/<chatId>/<body>")
 def send(chatId, username, password, body):
-    if authCheck(username, password) and chatId in chats:
+    if authCheck(username, password) and (chatId in chats) and len(body)<=256:
         if username in chats[chatId]["users"]:
-            chats[chatId]["texts"].insert(0, (username, body))
+            chats[chatId]["texts"].insert(0, (username, body, time.time()))
             return "Message successfully sent"
         else:
             return "Error sending message"
@@ -162,4 +188,4 @@ def recieve(chatId, username, password, fromIndex, toIndex):
 
 # Starting point of the app
 if __name__ == "__main__":
-    app.run(port=5050, debug=True)
+    app.run(port=80, debug=True)

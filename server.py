@@ -86,15 +86,16 @@ def root():
     Welcome to RhymeChat2 API. This server operates in a REST fashion.</br>
     </br>
     Available command:</br>
-    1) Signing up -> "/signup/username/password"</br>
+    1) Signing up -> "/signup/username/password/email"</br>
     2) Creating Chat Room -> "/createChatRoom/username/password"</br>
     3) Getting Chat Rooms -> "/getChatRooms/username/password"</br>
     4) Add someone to Chat Room -> "/addToChatRoom/username/password/chatId/personToAdd"</br>
     5) Making someone Admin -> "/makeAdmin/username/password/chatId/personToMakeAdmin"</br>
     6) Removong someone from Admin -> "/removeAdmin/username/password/chatId/personToRemoveFromAdmin"</br>
     7) Get Chat Room data -> "/getChatRoomData/username/password/chatId"</br>
-    8) Send text to Chat Room "/send/username/password/chatId/body"</br>
-    9) Recive texts from a Chat Room "/recv/username/password/chatId/fromIndex/toIndex"
+    8) Send text to Chat Room -> "/send/username/password/chatId/body"</br>
+    9) Recive texts from a Chat Room -> "/recv/username/password/chatId/fromIndex/toIndex"</br>
+    10) Save to DB -> "/saveData/code"
     """
 
 @app.route("/saveData/<code>")
@@ -109,11 +110,11 @@ def saveDatabase(code):
     else:
         return "Failed to save"
 
-@app.route("/signup/<username>/<password>")
-def signup(username, password):
-    if usernameCharCheck(username) and (username not in accounts) and (len(username) >= 4) and (len(username) <= 18):
+@app.route("/signup/<username>/<password>/<email>")
+def signup(username, password, email):
+    if usernameCharCheck(username) and (username not in accounts) and (len(username) >= 4) and (len(username) <= 18) and (len(email) > 1) and (len(email) <= 320):
         if len(password) >= 8 and len(password) <= 64:
-            accounts[username] = {"index": len(accounts), "password": hashlib.sha256((password+hashSalt).encode("ascii")).hexdigest(), "joined": time.time(), "chats": []}
+            accounts[username] = {"password": hashlib.sha256((password+hashSalt).encode("ascii")).hexdigest(), "email": email, "joined": time.time(), "chats": []}
             return "Account successfully created"
         else:
             return "Password too short"

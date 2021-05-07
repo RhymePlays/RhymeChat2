@@ -1,0 +1,132 @@
+body{margin: 0;height: 100%;}
+html{height: 100%;}
+
+/* Body */
+#app{
+    height: 100%;
+    background: #303030;
+    display: flex;
+    flex-direction: row;
+    color: white;
+    font-family: "Roboto", Arial, Helvetica, sans-serif;
+}
+
+/* Global */
+.sectionTitle{
+    color: #1BADFF;
+    font-weight: bold;
+    font-size: 20px;
+}
+#app ::-webkit-scrollbar{
+    background: #404040;
+    border-radius: 10px;
+    width: 10px;
+}
+#app ::-webkit-scrollbar-thumb{
+    background: #606060;
+    border-radius: 10px;
+}
+
+/* leftPanel */
+#leftPanel{
+    background: #404040;
+    width: 30%;
+    max-width: 250px;
+    padding: 10px;
+    border-top-right-radius: 20px;
+    font-family: "Montserrat";
+    overflow-y: auto;
+}
+.chatRoomItem{
+    background: #303030;
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 5px;
+    color: white;
+}.chatRoomItem .active{
+    background: #1BADFF;
+    color: #404040;
+}
+.CreateChatRoom{
+    background: #25FFB1;
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 5px;
+    color: #404040;
+}
+
+/* mainArea */
+#mainArea{
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+#mainArea hr{
+    border-style: solid;
+    border-color: #404040;
+    border-width: 2px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+#allTextItems{
+    overflow-y: auto;
+}
+.textItem{
+    padding-bottom: 5px;
+}
+.textItemNameNDate{
+    display: flex;
+    align-items: center;
+}
+.textItemUsername{
+    color: #1BADFF;
+    margin-right: 5px;
+    font-weight: bold;
+}
+.textItemTime{
+    color: #606060;
+    font-size: 12px;
+}
+
+/* bottomPanel */
+#bottomPanel{
+    display: flex;
+    flex-direction: row;
+    margin-top: auto;
+    padding-top: 10px;
+}
+#refreshButton{
+    background: #404040;
+    min-width: 40px;max-width: 40px;
+    height: 30px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+#textField{
+    background: #404040;
+    color: white;
+    width: 100%;
+    border: 1;
+    border-radius: 5px;
+    border-style: solid;
+    border-color: #1BADFF;
+}
+#sendButton{
+    background: #25FFB1;
+    min-width: 40px;max-width: 40px;
+    height: 30px;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+
+/* rightPanel */
+#rightPanel{
+    background: #404040;
+    width: 30%;
+    max-width: 250px;
+    padding: 10px;
+    border-top-left-radius: 20px;
+    overflow-y: auto;
+}

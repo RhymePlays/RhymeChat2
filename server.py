@@ -41,6 +41,8 @@ chats = {
     # }
 }
 
+webUI = ""
+
 # Functions
 def usernameCharCheck(username):
     username=username.lower()
@@ -66,7 +68,7 @@ def loadDatabase():
             accounts = data["accounts"]
             chats = data["chats"]
     except:
-        print("ERROR! Failed to load database")
+        print("Failed to load database")
 
 def autoSaveDatabase():
     while autoSave:
@@ -78,9 +80,21 @@ def autoSaveDatabase():
         except:
             print("Failed to auto-save database "+str(time.time()))
 
+def loadWebUI():
+    global webUI
+    try:
+        with open("index.html", "r") as f:
+            webUI = f.read()
+    except:
+        print("Failed to load webUI")
+
 # Routes
 @app.route("/")
 def root():
+    return webUI
+
+@app.route("/api")
+def api():
     return """
     Konnichiwa Sekai</br>
     Welcome to RhymeChat2 API. This server operates in a REST fashion.</br>
@@ -126,7 +140,7 @@ def getChatRooms(username, password):
     if authCheck(username, password):
         return json.dumps(accounts[username]["chats"])
     else:
-        return "Error getting chats"
+        return "error"
 
 @app.route("/createChatRoom/<username>/<password>")
 def createChatRoom(username, password):
@@ -136,7 +150,7 @@ def createChatRoom(username, password):
         accounts[username]["chats"].append(chatId)
         return chatId
     else:
-        return "Error creating chat"
+        return "error"
 
 @app.route("/addToChatRoom/<username>/<password>/<chatId>/<personToAdd>")
 def addToChatRoom(chatId, username, password, personToAdd):
@@ -144,22 +158,22 @@ def addToChatRoom(chatId, username, password, personToAdd):
         if username in chats[chatId]["admins"]:
             chats[chatId]["users"].append(personToAdd)
             accounts[personToAdd]["chats"].append(chatId)
-            return "User successfully added"
+            return "success"
         else:
-            return "Admin role needed"
+            return "error"
     else:
-        return "Error adding to chat"
+        return "error"
 
 @app.route("/makeAdmin/<username>/<password>/<chatId>/<personToMakeAdmin>")
 def makeAdmin(chatId, username, password, personToMakeAdmin):
     if authCheck(username, password) and (personToMakeAdmin in accounts) and (chatId in chats):
         if (username in chats[chatId]["admins"]) and (personToMakeAdmin not in chats[chatId]["admins"]) and (personToMakeAdmin in chats[chatId]["users"]):
             chats[chatId]["admins"].append(personToMakeAdmin)
-            return "User successfully made admin"
+            return "success"
         else:
-            return "Admin role needed or user already admin"
+            return "error"
     else:
-        return "Error making admin"
+        return "error"
 
 @app.route("/removeAdmin/<username>/<password>/<chatId>/<personToRemoveFromAdmin>")
 def removeAdmin(chatId, username, password, personToRemoveFromAdmin):
@@ -167,13 +181,13 @@ def removeAdmin(chatId, username, password, personToRemoveFromAdmin):
         if (username in chats[chatId]["admins"]) and (personToRemoveFromAdmin in chats[chatId]["admins"]) and (personToRemoveFromAdmin in chats[chatId]["users"]):
             if len(chats[chatId]["admins"])>1:
                 chats[chatId]["admins"].remove(personToRemoveFromAdmin)
-                return "Successfully removed user from admin"
+                return "success"
             else:
-                return "Cannot remove the only admin"
+                return "error"
         else:
-            return "Admin role needed or user not admin"
+            return "error"
     else:
-        return "Error removing admin"
+        return "error"
 
 @app.route("/getChatRoomData/<username>/<password>/<chatId>")
 def getChatRoomData(username, password, chatId):
@@ -185,20 +199,20 @@ def getChatRoomData(username, password, chatId):
                 "settings": chats[chatId]["settings"]
             })
         else:
-            return "Error getting data"
+            return "error"
     else:
-        return "Error getting data"
+        return "error"
 
 @app.route("/send/<username>/<password>/<chatId>/<body>")
 def send(chatId, username, password, body):
     if authCheck(username, password) and (chatId in chats) and (len(body)>=1) and (len(body)<=256):
         if username in chats[chatId]["users"]:
             chats[chatId]["texts"].insert(0, (username, body, time.time()))
-            return "Message successfully sent"
+            return "success"
         else:
-            return "Error sending message"
+            return "error"
     else:
-        return "Error sending message"
+        return "error"
 
 @app.route("/recv/<username>/<password>/<chatId>/<fromIndex>/<toIndex>")
 def recieve(chatId, username, password, fromIndex, toIndex):
@@ -214,14 +228,14 @@ def recieve(chatId, username, password, fromIndex, toIndex):
                         return json.dumps(returnValue)
                 return json.dumps(returnValue)
             except:
-                return "Error getting chat"
+                return "error"
         else:
-            return "Error getting chat"
+            return "error"
     else:
-        return "Error getting chat"
+        return "error"
 
 # Starting point of the app
 if __name__ == "__main__":
-    loadDatabase()
+    loadDatabase();loadWebUI()
     savingThread = threading.Thread(target=autoSaveDatabase);savingThread.start()
     app.run(port=80, debug=True)

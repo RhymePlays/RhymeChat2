@@ -26,6 +26,12 @@ html{height: 100%;}
     background: #606060;
     border-radius: 10px;
 }
+hr{
+    border-style: solid;
+    border-color: #404040;
+    border-width: 2px;
+    border-radius: 5px;
+}
 
 /* leftPanel */
 #leftPanel{
@@ -43,17 +49,22 @@ html{height: 100%;}
     margin: 10px 0;
     border-radius: 5px;
     color: white;
+    cursor: pointer;
+    transition: 150ms;
+    overflow: hidden;
 }.chatRoomItem .active{
     background: #1BADFF;
     color: #404040;
-}
+}.chatRoomItem:hover{filter: brightness(0.8);transition: 200ms;}
 .CreateChatRoom{
     background: #25FFB1;
+    color: #404040;
     padding: 8px;
     margin: 10px 0;
     border-radius: 5px;
-    color: #404040;
-}
+    cursor: pointer;
+    transition: 150ms;
+}.CreateChatRoom:hover{filter: brightness(0.8);transition: 200ms;}
 
 /* mainArea */
 #mainArea{
@@ -63,10 +74,6 @@ html{height: 100%;}
     flex-direction: column;
 }
 #mainArea hr{
-    border-style: solid;
-    border-color: #404040;
-    border-width: 2px;
-    border-radius: 5px;
     margin-right: 5px;
 }
 #allTextItems{
@@ -102,7 +109,8 @@ html{height: 100%;}
     height: 30px;
     border-radius: 5px;
     margin-right: 10px;
-}
+    transition: 200ms;
+}#refreshButton:hover{filter: brightness(0.8);transition: 200ms;}#refreshButton svg{width: 100%;height: 100%;fill: white;}
 #textField{
     background: #404040;
     color: white;
@@ -118,8 +126,8 @@ html{height: 100%;}
     height: 30px;
     border-radius: 5px;
     margin-left: 10px;
-}
-
+    transition: 200ms;
+}#sendButton:hover{filter: brightness(0.8);transition: 200ms;}#sendButton svg{width: 100%;height: 100%;fill: #404040;}
 
 /* rightPanel */
 #rightPanel{
@@ -129,4 +137,54 @@ html{height: 100%;}
     padding: 10px;
     border-top-left-radius: 20px;
     overflow-y: auto;
+}#rightPanel hr{
+    border-color: #303030;
+}
+.rightPanelUserItem{
+    background: #303030;
+    height: 30px;
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 5px;
+    margin-top: 10px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-right: 5px;
+    transition: 150ms;
+}.rightPanelUserItem:hover{filter: brightness(0.8);transition: 200ms;}
+.rightPanelUserItemName{
+    overflow: hidden;
+}
+.removeAdminButton{
+    display: block;
+    background: #FB1E46;
+    margin-left: 10px;
+    height: 30px;
+    width: 40px;
+    border-radius: 5px;
+    /* margin-left: auto; */
+    position: absolute;
+    right: 5px;
+}.removeAdminButton svg{
+    fill: white;
+    height: 100%;
+    width: 100%;
+}
+.makeAdminButton{
+    display: block;
+    background: #25FFB1;
+    margin-left: 10px;
+    height: 30px;
+    width: 40px;
+    border-radius: 5px;
+    /* margin-left: auto; */
+    position: absolute;
+    right: 5px;
+}.makeAdminButton svg{
+    fill: #303030;
+    height: 100%;
+    width: 100%;
 }
